@@ -69,6 +69,46 @@ npm run dev
 | Schema校验 | `schema_check` | Schema规则 | 规则编号、目标数据、字段名 |
 | 内容缓存 | `content_cache` | 缓存配置 | 配置编号、缓存类型、过期策略 |
 
+## 字段转换预演与执行清单
+
+清洗工序启用前可以先用真实采集行核对出数，入口都在 `clean_pipeline` 下：
+
+| 接口 | 说明 |
+| --- | --- |
+| `POST /api/clean_pipeline/{id}/preview` | 转换预演视图：按执行次序排列字段，返回可计算值、阻塞依赖和成环字段 |
+| `POST /api/clean_pipeline/{id}/transform` | 正式转换：消费冻结的执行清单，写出唯一正式值并记录交付台账 |
+| `GET /api/clean_pipeline/{id}/checklist` | 读取执行清单，`?version=v1` 可回查历史版本 |
+| `GET /api/clean_pipeline/{id}/result` | 读取正式结果，`?version=v1` 可回查历史结果 |
+| `GET /api/clean_pipeline/{id}/samples` | 列出已登记的真实采集样本 |
+| `POST /api/clean_pipeline/{id}/actions` | 原工序启用入口，`action=启用工序` 时可携带 `sample`，启用即提交清单并完成正式转换 |
+
+也支持按工序编号访问：`/api/clean_pipeline/code/{工序编号}/...`。
+
+预演请求体的形状：
+
+```json
+{
+  "sample": {
+    "样本编号": "SAMPLE-PRICE-7",
+    "字段值": {"价格": "7", "商品分类原值": "A"},
+    "模板版本": "TPL-v3"
+  }
+}
+```
+
+也可以只给 `sample_id`（例如数据抽取交付的样本），或直接给 `values`。
+数据抽取模板标记生效时会把实际样本值和模板版本登记给清洗管道。
+
+行为约定：
+
+- 目标字段之间的依赖按拓扑次序执行；同一目标的多条规则都列在视图里，
+  但正式值最多一条。
+- 依赖缺失或互引用成环时，字段标记为阻塞并列出阻塞依赖，绝不写空值；
+  不依赖冲突组的字段照常出数。
+- 清单冻结样本身份、样本值、模板版本和每条规则的实际版本；正式转换只消费清单。
+- 依赖补齐后按规则快照差异 + 下游闭包计算重跑范围，未受影响字段不重新交付；
+  历史清单版本和已交付值仍可回查。
+
 ## 约定
 
 - 全部模块共享`frontend/src/views/WorkbenchView.vue|tsx`和一套资源路由。

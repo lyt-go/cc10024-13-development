@@ -91,8 +91,16 @@ def create_entry(module: str, payload: EntryPayload) -> ActionResult:
     return ActionResult(ok=True, message=f"{service.ENTITY}已登记", entry=entry)
 
 
+@router.put("/{module}/{entry_id}", response_model=ActionResult)
+def update_entry(module: str, entry_id: int, payload: EntryPayload) -> ActionResult:
+    service = require_service(module)
+    entry, message = service.update_entry(entry_id, payload.values)
+    return ActionResult(ok=entry is not None, message=message, entry=entry)
+
+
 @router.post("/{module}/{entry_id}/actions", response_model=ActionResult)
 def run_action(module: str, entry_id: int, payload: ActionPayload) -> ActionResult:
     service = require_service(module)
-    entry, message = service.run_action(entry_id, payload.action.strip())
+    entry, message = service.run_action(
+        entry_id, payload.action.strip(), payload.model_dump(exclude_none=True))
     return ActionResult(ok=entry is not None, message=message, entry=entry)

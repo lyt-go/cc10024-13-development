@@ -88,7 +88,35 @@ class BaseModuleService:
         self._persist_to_jsonl(entry, action="create")
         return entry, []
 
-    def run_action(self, entry_id: int, action: str) -> tuple[dict[str, Any] | None, str]:
+    def update_entry(self, entry_id: int, values: dict[str, Any]) -> tuple[dict[str, Any] | None, str]:
+        """按字段更新条目；未声明的字段不允许写入，避免破坏领域结构。"""
+        entry = store.find(self.MODULE, entry_id)
+        if entry is None:
+            return None, f"{self.ENTITY} {entry_id} 不存在或已归档"
+        missing = [
+            field for field in self.REQUIRED_FIELDS
+            if field in values and not str(values.get(field) or "").strip()
+        ]
+        if missing:
+            return None, f"缺少必填字段：{'、'.join(missing)}"
+        changed = False
+        for field in [*self.LIST_FIELDS, "status"]:
+            if field in values and values[field] is not None:
+                entry[field] = values[field]
+                changed = True
+        if not changed:
+            return entry, f"{self.ENTITY}未发生变化"
+        entry["version"] = _version_id(entry)
+        entry["updated_at"] = persist.now_iso()
+        self._persist_to_jsonl(entry, action="update")
+        return entry, f"{self.ENTITY}已更新"
+
+    def run_action(
+        self,
+        entry_id: int,
+        action: str,
+        payload: dict[str, Any] | None = None,
+    ) -> tuple[dict[str, Any] | None, str]:
         entry = store.find(self.MODULE, entry_id)
         if entry is None:
             return None, f"{self.ENTITY} {entry_id} 不存在或已归档"

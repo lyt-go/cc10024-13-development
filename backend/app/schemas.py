@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any, Generic, TypeVar
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 T = TypeVar("T")
 
@@ -27,5 +27,9 @@ class EntryPayload(BaseModel):
 
 
 class ActionPayload(BaseModel):
+    """动作载荷：除 action 外允许携带样本、清单、重跑范围等扩展字段。"""
+
+    model_config = ConfigDict(extra="allow")
+
     action: str
     remark: str | None = None

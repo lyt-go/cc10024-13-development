@@ -70,3 +70,27 @@ body { margin: 0; background: #f6f8fb; color: #1f2937; }
 .analysis-chart { display: flex; align-items: flex-end; gap: 8px; height: 160px; padding: 12px 0; }
 .analysis-bar { flex: 1; border-radius: 4px 4px 0 0; background: var(--brand); min-width: 24px; position: relative; transition: height 0.4s; }
 .analysis-bar span { position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); font-size: 10px; color: var(--muted); white-space: nowrap; }
+
+/* 转换预演 / 字段转换执行清单 */
+.transform-panel { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin: 12px 0; }
+.panel-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.panel-head h3 { margin: 0 0 4px; font-size: 15px; }
+.panel-pipeline { min-width: 180px; }
+.sample-form { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin: 12px 0; }
+.sample-values { flex: 1; min-width: 280px; }
+.sample-values textarea { width: 100%; border: 1px solid var(--border); border-radius: 6px; padding: 8px; font-family: monospace; font-size: 12px; resize: vertical; }
+.sample-actions { display: flex; gap: 8px; }
+.transform-summary { display: flex; gap: 12px; margin-bottom: 12px; }
+.stat-value.small { font-size: 13px; word-break: break-all; }
+.badge { display: inline-block; border-radius: 10px; padding: 1px 8px; font-size: 12px; }
+.badge-ok { background: #e7f6ec; color: #1a7f37; }
+.badge-warn { background: #fff4e5; color: #b25e09; }
+.badge-blocked { background: #fdeceb; color: #b42318; }
+.row-blocked td { background: #fffafa; }
+.blocked-box, .checklist-box, .deliveries-box { border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-top: 12px; background: #fafbfc; }
+.blocked-box h4, .checklist-box h4, .deliveries-box h4 { margin: 0 0 8px; font-size: 13px; }
+.blocked-box p { margin: 4px 0; font-size: 13px; }
+.checklist-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px; }
+.checklist-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; margin: 0 0 12px; }
+.checklist-meta dt { font-size: 12px; color: var(--muted); }
+.checklist-meta dd { font-size: 13px; margin: 2px 0 0; word-break: break-all; }

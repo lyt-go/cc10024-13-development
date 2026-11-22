@@ -70,6 +70,12 @@
       </tbody>
     </table>
 
+    <TransformPreviewPanel
+      v-if="meta.key === 'clean_pipeline'"
+      :pipelines="pipelineOptions"
+      :current-pipeline-id="pipelineOptions[0]?.id"
+    />
+
     <div v-if="showCreate" class="modal-backdrop" data-testid="create-modal">
       <form class="modal" @submit.prevent="submitCreate">
         <h3>登记{{ meta.entity }}</h3>
@@ -104,6 +110,7 @@ import {
   runAction as applyAction,
 } from '@/api/backend-service'
 import type { EntryRow } from '@/data/types'
+import TransformPreviewPanel from '@/components/TransformPreviewPanel.vue'
 
 const props = defineProps<{ moduleKey: string }>()
 const meta = moduleMeta(props.moduleKey)
@@ -115,6 +122,12 @@ const filterFields = meta.fields.slice(0, 3)
 const showCreate = ref(false)
 const creating = ref(false)
 const createValues = ref<Record<string, string>>({})
+const pipelineOptions = computed(() =>
+  rows.value.map((row) => ({
+    id: Number(row.id),
+    code: String(row['工序编号'] ?? row.id),
+  })),
+)
 const stats = computed(() => [
   { label: meta.metrics[0], value: total.value },
   { label: meta.metrics[1], value: rows.value.filter((row) => row.status === meta.statuses[1]).length },
